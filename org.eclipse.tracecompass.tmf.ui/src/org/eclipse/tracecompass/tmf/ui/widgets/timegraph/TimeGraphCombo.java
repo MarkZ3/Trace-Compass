@@ -54,11 +54,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -136,10 +134,7 @@ public class TimeGraphCombo extends Composite {
     /** List of all expanded items whose parents are also expanded */
     private List<TreeItem> fVisibleExpandedItems = null;
 
-    private Listener fSashDragListener;
-
     private SashForm fSashForm;
-    //private final TmfSignalThrottler fTimeAlignmentThrottle = new TmfSignalThrottler(null, 200);
 
     // ------------------------------------------------------------------------
     // Classes
@@ -368,37 +363,14 @@ public class TimeGraphCombo extends Composite {
      * @param style
      *            the style of widget to construct
      * @param weights
-     *            The array (length 2) of relative weights of each side of the sash form
+     *            The array (length 2) of relative weights of each side of the
+     *            sash form
      */
     public TimeGraphCombo(Composite parent, int style, int[] weights) {
         super(parent, style);
         setLayout(new FillLayout());
 
         fSashForm = new SashForm(this, SWT.NONE);
-        fSashForm.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                // Sashes in a SashForm are being created on layout so add the
-                // drag listener here
-                if (fSashDragListener == null) {
-                    for (Control control : fSashForm.getChildren()) {
-                        if (control instanceof Sash) {
-                            fSashDragListener = new Listener() {
-
-                                @Override
-                                public void handleEvent(Event event) {
-                                    sendTimeViewAlignmentChanged();
-
-                                }
-                            };
-                            control.addListener(SWT.Selection, fSashDragListener);
-                            // There should be only one sash
-                            break;
-                        }
-                    }
-                }
-            }
-        });
 
         fTreeViewer = new TreeViewer(fSashForm, SWT.FULL_SELECTION | SWT.H_SCROLL);
         fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
@@ -648,12 +620,26 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
-        // The filler rows are required to ensure alignment when the tree does not have a
-        // visible horizontal scroll bar. The tree does not allow its top item to be set
-        // to a value that would cause blank space to be drawn at the bottom of the tree.
+        fTimeGraphViewer.getTimeGraphControl().addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(ControlEvent arg0) {
+                if (!fMoveFromView[0]) {
+                    sendTimeViewAlignmentChanged();
+                }
+                fMoveFromView[0] = false;
+            }
+        });
+
+        // The filler rows are required to ensure alignment when the tree does
+        // not have a
+        // visible horizontal scroll bar. The tree does not allow its top item
+        // to be set
+        // to a value that would cause blank space to be drawn at the bottom of
+        // the tree.
         fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree);
 
         fSashForm.setWeights(weights);
+
     }
 
     private void sendTimeViewAlignmentChanged() {
@@ -1172,6 +1158,8 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
+    final boolean[] fMoveFromView = new boolean[1];
+
     /**
      * Update the widget based on the alignment signal
      *
@@ -1181,10 +1169,12 @@ public class TimeGraphCombo extends Composite {
      */
     public void timeViewAlignmentUpdated(TmfTimeViewAlignmentSignal signal) {
         if (signal.getSource() != fSashForm && signal.getTimeViewAlignmentInfo().isViewLocationNear(fSashForm.toDisplay(0, 0))) {
+            fMoveFromView[0] = true;
             int total = fSashForm.getBounds().width;
             int timeAxisOffset = Math.min(signal.getTimeViewAlignmentInfo().getTimeAxisOffset(), total);
             int width1 = (int) (timeAxisOffset / (float) total * 1000);
             int width2 = (int) ((total - timeAxisOffset) / (float) total * 1000);
+
             fSashForm.setWeights(new int[] { width1, width2 });
             fSashForm.layout(); // nedded?
         }
