@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.varia.NullAppender;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -86,8 +85,7 @@ public class StandardImportGzipTraceTest {
     public static void init() {
         SWTBotUtils.initialize();
         zipTrace();
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new NullAppender());
+        SWTBotUtils.configureLogger(fLogger);
     }
 
     /**

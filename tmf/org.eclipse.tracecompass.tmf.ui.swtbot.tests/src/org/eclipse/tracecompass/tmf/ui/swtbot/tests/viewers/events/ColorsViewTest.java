@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -169,8 +167,7 @@ public class ColorsViewTest {
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
+        SWTBotUtils.configureLogger(fLogger);
         fBot = new SWTWorkbenchBot();
 
         SWTBotUtils.closeView("welcome", fBot);

@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -87,8 +85,7 @@ public class TestTraceOffsetting {
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
+        SWTBotUtils.configureLogger(fLogger);
         fBot = new SWTWorkbenchBot();
 
         IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);

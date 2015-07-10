@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.varia.NullAppender;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -109,7 +108,7 @@ public class FetchRemoteTracesTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         SWTBotUtils.initialize();
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        Logger.getRootLogger().addAppender(new NullAppender());
+        SWTBotUtils.configureLogger(Logger.getRootLogger());
         fBot = new SWTWorkbenchBot();
 
         SWTBotUtils.closeView(WELCOME_NAME, fBot);

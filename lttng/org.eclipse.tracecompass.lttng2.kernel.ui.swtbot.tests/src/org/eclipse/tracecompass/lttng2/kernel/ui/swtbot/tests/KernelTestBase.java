@@ -18,9 +18,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -73,8 +71,7 @@ public abstract class KernelTestBase {
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
+        SWTBotUtils.configureLogger(fLogger);
         fBot = new SWTWorkbenchBot();
 
         final List<SWTBotView> openViews = fBot.views();
