@@ -361,8 +361,8 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
             if (condition.getAttributes().getNamedItem("conditionsOrganization") != null) {
                 Deque<Token> tokens = tokenize(condition.getAttributes().getNamedItem("conditionsOrganization").getNodeValue());
                 ASTNode root = parseStart(tokens);
-                root.accept(new ASTVisitor(){});
-                conditionSingle = astToSingleCondition(root);
+                root.accept(new ASTVisitor());
+                conditionSingle = astToXmlConditionSingle(root);
             }
 
 //			ConditionMultiple conditionMultiple = new ConditionMultiple();
@@ -419,30 +419,30 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
 		return stateChange;
 	}
 
-    private ConditionSingle astToSingleCondition(ASTNode root) {
-        ConditionSingle rootXML = factory.createConditionSingle();
+    private ConditionSingle astToXmlConditionSingle(ASTNode root) {
+        ConditionSingle xmlSingleCondition = factory.createConditionSingle();
         switch (root.token.type) {
         case OPERAND:
-            rootXML.setCondition(fConditions.get(root.token.conditionNum).getFirst());
+            xmlSingleCondition.setCondition(fConditions.get(root.token.conditionNum).getFirst());
             break;
         case OPERATOR_NOT:
-            rootXML.setNot(astToSingleCondition(root.children.get(0)));
+            xmlSingleCondition.setNot(astToXmlConditionSingle(root.children.get(0)));
             break;
         case OPERATOR_AND:
-            rootXML.setAnd(astToMultiCondition(root));
+            xmlSingleCondition.setAnd(astToXmlConditionMulti(root));
             break;
         case OPERATOR_OR:
-            rootXML.setOr(astToMultiCondition(root));
+            xmlSingleCondition.setOr(astToXmlConditionMulti(root));
             break;
         // $CASES-OMITTED$
         default:
             throw new IllegalStateException("invalid node type");
         }
 
-        return rootXML;
+        return xmlSingleCondition;
     }
 
-    private ConditionMultiple astToMultiCondition(ASTNode parentMulti) {
+    private ConditionMultiple astToXmlConditionMulti(ASTNode parentMulti) {
         ConditionMultiple multiple = factory.createConditionMultiple();
         for (ASTNode node : parentMulti.children) {
             switch (node.token.type) {
@@ -451,13 +451,13 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
                 multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleCondition(condition));
                 break;
             case OPERATOR_NOT:
-                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleNot(astToSingleCondition(node.children.get(0))));
+                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleNot(astToXmlConditionSingle(node.children.get(0))));
                 break;
             case OPERATOR_AND:
-                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleAnd(astToMultiCondition(node)));
+                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleAnd(astToXmlConditionMulti(node)));
                 break;
             case OPERATOR_OR:
-                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleOr(astToMultiCondition(node)));
+                multiple.getConditionAndOrAndAnd().add(factory.createConditionMultipleOr(astToXmlConditionMulti(node)));
                 break;
             // $CASES-OMITTED$
             default:
@@ -468,9 +468,10 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
     }
 
     private static class ASTNode {
-	    Token token;
-	    List<ASTNode> children = new ArrayList<>();
-        public ASTNode(Token token) {
+	    private Token token;
+	    private List<ASTNode> children = new ArrayList<>();
+
+	    public ASTNode(Token token) {
             super();
             this.token = token;
         }
@@ -493,93 +494,59 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
 
 	}
 
-	abstract class ASTVisitor {
-	    int indent = 0;
-	    public void visit(ASTNode node) {
-	        for (int i = 0; i < indent; i++) {
-	            System.out.print(" ");
-	        }
-	        System.out.println(node);
-	        indent+=2;
-	    }
+    private class ASTVisitor {
+        private int indent = 0;
+
+        public void visit(ASTNode node) {
+            for (int i = 0; i < indent; i++) {
+                System.out.print(" "); //$NON-NLS-1$
+            }
+            System.out.println(node);
+            indent += 2;
+        }
 
         public void leave(ASTNode astNode) {
             if (astNode != null) {
-                indent-=2;
+                indent -= 2;
             }
         }
-	}
+    }
 
-	private static ASTNode parseStart(Deque<Token> tokens) {
-	    return parseCondition(tokens);
-	}
+    /**
+     * Here's is the grammar, this method is the start.
+     *
+     * start_rule: condition;
+     * condition: conditionSingle ('OPERATOR' conditionSingle)*;
+     * conditionSingle: '(' condition ')' | 'OPERAND' | '!'conditionSingle;
+     */
+    private static ASTNode parseStart(Deque<Token> tokens) {
+        return parseCondition(tokens);
+    }
 
+    /**
+     * condition: conditionSingle ('OPERATOR' conditionSingle)*;
+     */
 	private static ASTNode parseCondition(Deque<Token> tokens) {
-	    List<Token> operators = new ArrayList<>();
 	    List<ASTNode> nodes = new ArrayList<>();
-	    ASTNode left = parseConditionSingle(tokens);
-        nodes.add(left);
+
+	    ASTNode firstCondition = parseConditionSingle(tokens);
+        nodes.add(firstCondition);
+
+        List<Token> operators = new ArrayList<>();
 	    while(!tokens.isEmpty() && isOperator(tokens.peek().type)) {
 	        operators.add(tokens.pop()); // AND or OR
 	        nodes.add(parseConditionSingle(tokens));
 	    }
-
 	    if (nodes.size() > 1) {
-	        return doOperatorPrecedence(operators, nodes);
+	        return createAndOrOrOperatorNode(operators, nodes);
 	    }
 
-        return left;
+        return firstCondition;
 	}
 
-	// TODO: simplify this
-    private static ASTNode doOperatorPrecedence(List<Token> operators, List<ASTNode> nodes) {
-        List<ASTNode> newNodes = new ArrayList<>();
-        Token operator = null;
-
-        if (operators.size() > 1) {
-            ASTNode multiAndNode = new ASTNode(new Token(TokenType.OPERATOR_AND));
-            for (int i = 0; i < operators.size(); i++) {
-                Token token = operators.get(i);
-                if (token.type == TokenType.OPERATOR_AND) {
-                    multiAndNode.addChild(nodes.get(i));
-                } else {
-                    if (!multiAndNode.children.isEmpty()) {
-                        multiAndNode.addChild(nodes.get(i));
-                        newNodes.add(multiAndNode);
-                        multiAndNode = new ASTNode(new Token(TokenType.OPERATOR_AND));
-                    } else {
-                        newNodes.add(nodes.get(i));
-                    }
-                }
-
-                if (i == operators.size() - 1) {
-                    if (!multiAndNode.children.isEmpty()) {
-                        multiAndNode.addChild(nodes.get(i + 1));
-                        newNodes.add(multiAndNode);
-                    } else {
-                        newNodes.add(nodes.get(i + 1));
-                    }
-                }
-            }
-
-            if (newNodes.size() < nodes.size() && newNodes.size() > 1) {
-                operator = new Token(TokenType.OPERATOR_OR);
-            }
-        }
-
-        if (operator == null) {
-            newNodes = nodes;
-            operator = operators.get(0);
-        }
-
-        ASTNode multiNode = new ASTNode(operator);
-        for (ASTNode node : newNodes) {
-            multiNode.addChild(node);
-        }
-
-        return multiNode;
-    }
-
+    /**
+     * conditionSingle: '(' condition ')' | 'OPERAND' | '!'conditionSingle;
+     */
     private static ASTNode parseConditionSingle(Deque<Token> tokens) {
         Token token = tokens.pop();
         switch (token.type) {
@@ -600,6 +567,64 @@ public class TmfGraphitiXmlConverter implements ITmfXmlConverter {
         default:
             throw new IllegalStateException("Unexpected token " + token.type.chr);
         }
+    }
+
+    private static ASTNode createAndOrOrOperatorNode(List<Token> operators, List<ASTNode> nodes) {
+        List<ASTNode> newNodes = nodes;
+        Token operator = operators.get(0);
+
+        boolean allSameOperators = operators.stream().map((a) -> a.type).distinct().count() == 1;
+        if (!allSameOperators) {
+            newNodes = doOperatorPrecedence(operators, nodes);
+            // If we have some OR mixed with AND, the top-most operator is
+            // guaranteed to be OR because AND has precedence
+            operator = new Token(TokenType.OPERATOR_OR);
+        }
+
+        ASTNode multiNode = new ASTNode(operator);
+        for (ASTNode node : newNodes) {
+            multiNode.addChild(node);
+        }
+
+        return multiNode;
+    }
+
+    /**
+     * If we have some OR mixed with AND, the ANDs have to be evaluated first.
+     * To achieve this, this method creates new AND sub-nodes and adds them to
+     * the top-most OR node.
+     *
+     * For example: 1 OR 2 AND 3
+     *
+     * Result:
+     *
+     * <pre>
+     *         __OR__
+     *        |      |
+     *        1  ___AND__
+     *           |       |
+     *           2       3
+     * </pre>
+     */
+    private static List<ASTNode> doOperatorPrecedence(List<Token> operators, List<ASTNode> nodes) {
+        List<ASTNode> newNodes = new ArrayList<>();
+        // Accumulate "AND" operands until we see a "OR" or the end (no more operators)
+        ASTNode andSubNode = new ASTNode(new Token(TokenType.OPERATOR_AND));
+        for (int i = 0; i < nodes.size(); i++) {
+            ASTNode prevNode = nodes.get(i);
+            if (i < operators.size() && operators.get(i).type == TokenType.OPERATOR_AND) {
+                andSubNode.addChild(prevNode);
+            } else {
+                if (!andSubNode.children.isEmpty()) {
+                    andSubNode.addChild(prevNode);
+                    newNodes.add(andSubNode);
+                    andSubNode = new ASTNode(new Token(TokenType.OPERATOR_AND));
+                } else {
+                    newNodes.add(prevNode);
+                }
+            }
+        }
+        return newNodes;
     }
 
     private static boolean isOperator(TokenType type) {
