@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -27,14 +26,10 @@ import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.finders.ContextMenuFinder;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -50,7 +45,6 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IEditorReference;
-import org.hamcrest.core.IsAnything;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -141,16 +135,10 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         final List<String> EXPECTED_MENU_LABELS = ImmutableList.of(
-                "&Open\tShift+Ctrl+R", "Open With", "&Copy...\tCtrl+C", "Rena&me...\tF2", "&Delete\tDelete", "Delete &Supplementary Files...", "&Export Trace Package...", "Select &Trace Type...", "Apply Time Offset...", "Clear Time Offset",
-                "Refresh\tF5");
+                "Open", "Open With", "Copy...", "Rename...", "Delete", "Delete Supplementary Files...", "Export Trace Package...", "Select Trace Type...", "Apply Time Offset...", "Clear Time Offset",
+                "Refresh");
 
-        // TODO: SWTBot needs a better way to do this
-        ContextMenuFinder finder = new ContextMenuFinder(fBot.tree().widget);
-        List<MenuItem> menuItems = finder.findMenus(traceItem.contextMenu().widget, new IsAnything<>(), false);
-        @NonNull
-        List<String> menuLabels = menuItems.stream().map((item) -> {
-            return UIThreadRunnable.syncExec(() -> item.getText());
-        }).collect(Collectors.toList());
+        List<String> menuLabels = traceItem.contextMenu().menuItems();
         assertEquals(EXPECTED_MENU_LABELS, menuLabels);
 
         fBot.closeAllEditors();
@@ -168,6 +156,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_02Open() {
+        //FIXME: double opening! not testing properly!
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
@@ -273,6 +262,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_06OpenKeyboard() throws WidgetNotFoundException {
+        //FIXME: double opening! not testing properly!
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
@@ -321,6 +311,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_08OpenDoubleClick() throws WidgetNotFoundException {
+        //FIXME: double opening! not testing properly!
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
