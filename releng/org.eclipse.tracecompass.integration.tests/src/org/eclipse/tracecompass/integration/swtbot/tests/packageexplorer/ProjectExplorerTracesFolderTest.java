@@ -83,7 +83,7 @@ public class ProjectExplorerTracesFolderTest {
 
 
     private static @NonNull TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
-            LTTNG_KERNEL_TRACE.getFirst());
+            LTTNG_KERNEL_TRACE.getFirstEventTimestamp());
 
 
     private static TestTraceInfo UNRECOGNIZED_LOG = new TestTraceInfo("unrecognized.log", "", 0, "");
@@ -295,7 +295,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), renamed);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
-        testEventsTable(renamed, traceInfo.getNbEvents(), traceInfo.getFirst());
+        testEventsTable(renamed, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
     }
 
@@ -314,7 +314,7 @@ public class ProjectExplorerTracesFolderTest {
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirst());
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
         assertNotEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
     }
@@ -334,7 +334,7 @@ public class ProjectExplorerTracesFolderTest {
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirst());
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
         assertEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
     }
@@ -354,7 +354,7 @@ public class ProjectExplorerTracesFolderTest {
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirst());
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
         assertNotEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
     }
@@ -410,7 +410,7 @@ public class ProjectExplorerTracesFolderTest {
             SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
             checkTraceType(traceItem, info.getTraceType());
             openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirst());
+            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
         }
 
         // Also check unrecognized file
@@ -437,7 +437,7 @@ public class ProjectExplorerTracesFolderTest {
             SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
             checkTraceType(traceItem, info.getTraceType());
             openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirst());
+            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
         }
 
         // All traces should have clashed/overwritten plus the unrecognized trace
@@ -470,7 +470,7 @@ public class ProjectExplorerTracesFolderTest {
             SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
             checkTraceType(traceItem, info.getTraceType());
             openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirst());
+            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
         }
 
         // All traces should have clashed/overwritten plus the unrecognized trace
@@ -537,7 +537,7 @@ public class ProjectExplorerTracesFolderTest {
         checkTraceType(traceItem, traceInfo.getTraceType());
 
         openTrace(traceItem);
-        testEventsTable(traceInfo.getTraceName(), traceInfo.getNbEvents(), traceInfo.getFirst());
+        testEventsTable(traceInfo.getTraceName(), traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
     }
 
     private static void importTrace(String traceName, int optionFlags) {

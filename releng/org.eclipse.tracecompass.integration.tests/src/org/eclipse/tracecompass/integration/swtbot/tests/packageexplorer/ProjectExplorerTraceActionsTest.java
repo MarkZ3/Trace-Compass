@@ -390,7 +390,7 @@ public class ProjectExplorerTraceActionsTest {
         editor.bot().waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
-                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(CUSTOM_TEXT_LOG.getFirst());
+                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(CUSTOM_TEXT_LOG.getFirstEventTimestamp());
             }
 
             @Override
