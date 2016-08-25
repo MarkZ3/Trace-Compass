@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -73,15 +74,15 @@ public class ProjectExplorerTracesFolderTest {
     private static TestTraceInfo UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
 
 
-    private static TestTraceInfo CLASHES_CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "clashes/ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
-    private static TestTraceInfo CLASHES_CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "clashes/ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
-    private static TestTraceInfo CLASHES_LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "clashes/kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo CLASHES_SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "clashes/simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo CLASHES_SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "clashes/simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo CLASHES_UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "clashes/ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo CLASHES_CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "clashes/ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
+    private static @NonNull TestTraceInfo CLASHES_CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "clashes/ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
+    private static @NonNull TestTraceInfo CLASHES_LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "clashes/kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "clashes/simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "clashes/simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo CLASHES_UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "clashes/ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
 
 
-    private static TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
+    private static @NonNull TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
             LTTNG_KERNEL_TRACE.getFirst());
 
 
@@ -123,10 +124,6 @@ public class ProjectExplorerTracesFolderTest {
 
     private static String getPath(String relativePath) {
         return new Path(TEST_TRACES_PATH.getAbsolutePath()).append(relativePath).toOSString();
-        /* set up test trace */
-//        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(relativePath), null);
-//        URI uri = FileLocator.toFileURL(location).toURI();
-//        return new File(uri).getAbsolutePath();
     }
 
     /**
@@ -146,10 +143,8 @@ public class ProjectExplorerTracesFolderTest {
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        /* Close welcome view */
         SWTBotUtils.closeView("Welcome", fBot);
 
-        /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
