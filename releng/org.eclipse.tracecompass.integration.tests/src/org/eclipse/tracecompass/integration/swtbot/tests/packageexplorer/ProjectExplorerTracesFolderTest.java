@@ -224,7 +224,9 @@ public class ProjectExplorerTracesFolderTest {
                 "Refresh");
 
         List<String> menuLabels = traceItem.contextMenu().menuItems();
-        assertEquals(EXPECTED_MENU_LABELS, menuLabels);
+        for (int i = 0; i < menuLabels.size(); i++) {
+            assertEquals(EXPECTED_MENU_LABELS.get(i), menuLabels.get(i));
+        }
 
         fBot.closeAllEditors();
     }

@@ -17,7 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 
 /**
  * Util class to create directory structures detailed in chapter 3 of the
@@ -162,8 +162,8 @@ public class TestDirectoryStructureUtil {
         createFile(theClash, "ExampleCustomTxt.log", CUSTOM_TEXT_CONTENT);
         createFile(theClash, "ExampleCustomXml.xml", CUSTOM_XML_CONTENT);
 
-        LttngKernelTraceGenerator kernelGenerator = new LttngKernelTraceGenerator(1000, 1000, 1);
-        LttngKernelTraceGenerator ustGenerator = new LttngKernelTraceGenerator(1000, 1000, 1, false);
+        LttngTraceGenerator kernelGenerator = new LttngTraceGenerator(1000, 1000, 1);
+        LttngTraceGenerator ustGenerator = new LttngTraceGenerator(1000, 1000, 1, false);
         kernelGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "kernel-overlap-testing"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "ust-overlap-testing"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "simple_server-thread1"));

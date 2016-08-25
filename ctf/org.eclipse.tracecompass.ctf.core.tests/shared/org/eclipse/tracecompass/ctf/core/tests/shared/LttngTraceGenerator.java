@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,11 +33,11 @@ import java.util.Random;
 import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 
 /**
- * Generate a kernel trace
+ * Generate a lttng trace (kernel or ust)
  *
  * @author Matthew Khouzam
  */
-public class LttngKernelTraceGenerator {
+public class LttngTraceGenerator {
 
     private static final String metadataKernel = "/* CTF 1.8 */ \n" +
             "typealias integer { size = 8; align = 8; signed = false; } := uint8_t;\n" +
@@ -153,126 +153,126 @@ public class LttngKernelTraceGenerator {
             "};\n" +
             "\n";
 
-    private static final String metadataUst = "/* CTF 1.8 */ \n" +
-            "typealias integer { size = 8; align = 8; signed = false; } := uint8_t;\n" +
-            "typealias integer { size = 16; align = 8; signed = false; } := uint16_t;\n" +
-            "typealias integer { size = 32; align = 8; signed = false; } := uint32_t;\n" +
-            "typealias integer { size = 64; align = 8; signed = false; } := uint64_t;\n" +
-            "typealias integer { size = 32; align = 8; signed = false; } := unsigned long;\n" +
-            "typealias integer { size = 5; align = 1; signed = false; } := uint5_t;\n" +
-            "typealias integer { size = 27; align = 1; signed = false; } := uint27_t;\n" +
-            "\n" +
-            "trace {\n" +
-            "   major = 1;\n" +
-            "   minor = 8;\n" +
-            "   uuid = \"11111111-1111-1111-1111-111111111111\";\n" +
-            "   byte_order = le;\n" +
-            "   packet.header := struct {\n" +
-            "       uint32_t magic;\n" +
-            "       uint8_t  uuid[16];\n" +
-            "       uint32_t stream_id;\n" +
-            "   };\n" +
-            "};\n" +
-            "\n" +
-            "env {\n" +
-            "   hostname = \"synthetic-host\";\n" +
-            "   domain = \"ust\";\n" +
-            "   sysname = \"FakeLinux\";\n" +
-            "   kernel_release = \"1.0\";\n" +
-            "   kernel_version = \"Fake Os Synthetic Trace\";\n" +
-            "   tracer_name = \"lttng-ust\";\n" +
-            "   tracer_major = 2;\n" +
-            "   tracer_minor = 1;\n" +
-            "   tracer_patchlevel = 0;\n" +
-            "};\n" +
-            "\n" +
-            "clock {\n" +
-            "   name = monotonic;\n" +
-            "   uuid = \"bbff68f0-c633-4ea1-92cd-bd11024ec4de\";\n" +
-            "   description = \"Monotonic Clock\";\n" +
-            "   freq = 1000000000; /* Frequency, in Hz */\n" +
-            "   /* clock value offset from Epoch is: offset * (1/freq) */\n" +
-            "   offset = 1368000272650993664;\n" +
-            "};\n" +
-            "\n" +
-            "typealias integer {\n" +
-            "   size = 27; align = 1; signed = false;\n" +
-            "   map = clock.monotonic.value;\n" +
-            "} := uint27_clock_monotonic_t;\n" +
-            "\n" +
-            "typealias integer {\n" +
-            "   size = 32; align = 8; signed = false;\n" +
-            "   map = clock.monotonic.value;\n" +
-            "} := uint32_clock_monotonic_t;\n" +
-            "\n" +
-            "typealias integer {\n" +
-            "   size = 64; align = 8; signed = false;\n" +
-            "   map = clock.monotonic.value;\n" +
-            "} := uint64_clock_monotonic_t;\n" +
-            "\n" +
-            "struct packet_context {\n" +
-            "   uint64_clock_monotonic_t timestamp_begin;\n" +
-            "   uint64_clock_monotonic_t timestamp_end;\n" +
-            "   uint64_t content_size;\n" +
-            "   uint64_t packet_size;\n" +
-            "   unsigned long events_discarded;\n" +
-            "   uint32_t cpu_id;\n" +
-            "};\n" +
-            "\n" +
-            "struct event_header_compact {\n" +
-            "   enum : uint5_t { compact = 0 ... 30, extended = 31 } id;\n" +
-            "   variant <id> {\n" +
-            "       struct {\n" +
-            "           uint27_clock_monotonic_t timestamp;\n" +
-            "       } compact;\n" +
-            "       struct {\n" +
-            "           uint32_t id;\n" +
-            "           uint64_clock_monotonic_t timestamp;\n" +
-            "       } extended;\n" +
-            "   } v;\n" +
-            "} align(8);\n" +
-            "\n" +
-            "struct event_header_large {\n" +
-            "   enum : uint16_t { compact = 0 ... 65534, extended = 65535 } id;\n" +
-            "   variant <id> {\n" +
-            "       struct {\n" +
-            "           uint32_clock_monotonic_t timestamp;\n" +
-            "       } compact;\n" +
-            "       struct {\n" +
-            "           uint32_t id;\n" +
-            "           uint64_clock_monotonic_t timestamp;\n" +
-            "       } extended;\n" +
-            "   } v;\n" +
-            "} align(8);\n" +
-            "\n" +
-            "stream {\n" +
-            "   id = 0;\n" +
-            "   event.header := struct event_header_compact;\n" +
-            "   packet.context := struct packet_context;\n" +
-            "};\n" +
-            "\n" +
-            "event {\n" +
-            "   name = sched_switch;\n" +
-            "   id = 0;\n" +
-            "   stream_id = 0;\n" +
-            "   fields := struct {\n" +
-            "       integer { size = 8; align = 8; signed = 1; encoding = UTF8; base = 10; } _prev_comm[16];\n" +
-            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_tid;\n" +
-            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_prio;\n" +
-            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_state;\n" +
-            "       integer { size = 8; align = 8; signed = 1; encoding = UTF8; base = 10; } _next_comm[16];\n" +
-            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _next_tid;\n" +
-            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _next_prio;\n" +
-            "   };\n" +
-            "};\n" +
-            "\n";
+//    private static final String metadataUst = "/* CTF 1.8 */ \n" +
+//            "typealias integer { size = 8; align = 8; signed = false; } := uint8_t;\n" +
+//            "typealias integer { size = 16; align = 8; signed = false; } := uint16_t;\n" +
+//            "typealias integer { size = 32; align = 8; signed = false; } := uint32_t;\n" +
+//            "typealias integer { size = 64; align = 8; signed = false; } := uint64_t;\n" +
+//            "typealias integer { size = 32; align = 8; signed = false; } := unsigned long;\n" +
+//            "typealias integer { size = 5; align = 1; signed = false; } := uint5_t;\n" +
+//            "typealias integer { size = 27; align = 1; signed = false; } := uint27_t;\n" +
+//            "\n" +
+//            "trace {\n" +
+//            "   major = 1;\n" +
+//            "   minor = 8;\n" +
+//            "   uuid = \"11111111-1111-1111-1111-111111111111\";\n" +
+//            "   byte_order = le;\n" +
+//            "   packet.header := struct {\n" +
+//            "       uint32_t magic;\n" +
+//            "       uint8_t  uuid[16];\n" +
+//            "       uint32_t stream_id;\n" +
+//            "   };\n" +
+//            "};\n" +
+//            "\n" +
+//            "env {\n" +
+//            "   hostname = \"synthetic-host\";\n" +
+//            "   domain = \"ust\";\n" +
+//            "   sysname = \"FakeLinux\";\n" +
+//            "   kernel_release = \"1.0\";\n" +
+//            "   kernel_version = \"Fake Os Synthetic Trace\";\n" +
+//            "   tracer_name = \"lttng-ust\";\n" +
+//            "   tracer_major = 2;\n" +
+//            "   tracer_minor = 1;\n" +
+//            "   tracer_patchlevel = 0;\n" +
+//            "};\n" +
+//            "\n" +
+//            "clock {\n" +
+//            "   name = monotonic;\n" +
+//            "   uuid = \"bbff68f0-c633-4ea1-92cd-bd11024ec4de\";\n" +
+//            "   description = \"Monotonic Clock\";\n" +
+//            "   freq = 1000000000; /* Frequency, in Hz */\n" +
+//            "   /* clock value offset from Epoch is: offset * (1/freq) */\n" +
+//            "   offset = 1368000272650993664;\n" +
+//            "};\n" +
+//            "\n" +
+//            "typealias integer {\n" +
+//            "   size = 27; align = 1; signed = false;\n" +
+//            "   map = clock.monotonic.value;\n" +
+//            "} := uint27_clock_monotonic_t;\n" +
+//            "\n" +
+//            "typealias integer {\n" +
+//            "   size = 32; align = 8; signed = false;\n" +
+//            "   map = clock.monotonic.value;\n" +
+//            "} := uint32_clock_monotonic_t;\n" +
+//            "\n" +
+//            "typealias integer {\n" +
+//            "   size = 64; align = 8; signed = false;\n" +
+//            "   map = clock.monotonic.value;\n" +
+//            "} := uint64_clock_monotonic_t;\n" +
+//            "\n" +
+//            "struct packet_context {\n" +
+//            "   uint64_clock_monotonic_t timestamp_begin;\n" +
+//            "   uint64_clock_monotonic_t timestamp_end;\n" +
+//            "   uint64_t content_size;\n" +
+//            "   uint64_t packet_size;\n" +
+//            "   unsigned long events_discarded;\n" +
+//            "   uint32_t cpu_id;\n" +
+//            "};\n" +
+//            "\n" +
+//            "struct event_header_compact {\n" +
+//            "   enum : uint5_t { compact = 0 ... 30, extended = 31 } id;\n" +
+//            "   variant <id> {\n" +
+//            "       struct {\n" +
+//            "           uint27_clock_monotonic_t timestamp;\n" +
+//            "       } compact;\n" +
+//            "       struct {\n" +
+//            "           uint32_t id;\n" +
+//            "           uint64_clock_monotonic_t timestamp;\n" +
+//            "       } extended;\n" +
+//            "   } v;\n" +
+//            "} align(8);\n" +
+//            "\n" +
+//            "struct event_header_large {\n" +
+//            "   enum : uint16_t { compact = 0 ... 65534, extended = 65535 } id;\n" +
+//            "   variant <id> {\n" +
+//            "       struct {\n" +
+//            "           uint32_clock_monotonic_t timestamp;\n" +
+//            "       } compact;\n" +
+//            "       struct {\n" +
+//            "           uint32_t id;\n" +
+//            "           uint64_clock_monotonic_t timestamp;\n" +
+//            "       } extended;\n" +
+//            "   } v;\n" +
+//            "} align(8);\n" +
+//            "\n" +
+//            "stream {\n" +
+//            "   id = 0;\n" +
+//            "   event.header := struct event_header_compact;\n" +
+//            "   packet.context := struct packet_context;\n" +
+//            "};\n" +
+//            "\n" +
+//            "event {\n" +
+//            "   name = sched_switch;\n" +
+//            "   id = 0;\n" +
+//            "   stream_id = 0;\n" +
+//            "   fields := struct {\n" +
+//            "       integer { size = 8; align = 8; signed = 1; encoding = UTF8; base = 10; } _prev_comm[16];\n" +
+//            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_tid;\n" +
+//            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_prio;\n" +
+//            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _prev_state;\n" +
+//            "       integer { size = 8; align = 8; signed = 1; encoding = UTF8; base = 10; } _next_comm[16];\n" +
+//            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _next_tid;\n" +
+//            "       integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _next_prio;\n" +
+//            "   };\n" +
+//            "};\n" +
+//            "\n";
 
     private final List<String> fProcesses;
     private final long fDuration;
     private final long fNbEvents;
     private final int fNbChans;
 
-    private boolean fIsKernel = true;
+    private final boolean fIsKernel;
 
     private static final String[] sfProcesses = {
             "IDLE",
@@ -299,7 +299,7 @@ public class LttngKernelTraceGenerator {
     public static void main(String[] args) {
         // not using createTempFile as this is a directory
         String path = CtfCoreTestPlugin.getTemporaryDirPath() + File.separator + TRACE_NAME;
-        generateLttngKernelTrace(new File(path));
+        generateLttngTrace(new File(path));
     }
 
     /**
@@ -324,7 +324,7 @@ public class LttngKernelTraceGenerator {
         Path tracePath = Paths.get("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACES_DIRECTORY, TRACE_NAME);
         tracePath = tracePath.toAbsolutePath();
         File file = tracePath.toFile();
-        generateLttngKernelTrace(file);
+        generateLttngTrace(file);
         return file.getAbsolutePath();
     }
 
@@ -334,14 +334,14 @@ public class LttngKernelTraceGenerator {
      * @param file
      *            the file to write the trace to
      */
-    public static void generateLttngKernelTrace(File file) {
+    public static void generateLttngTrace(File file) {
         final int cpus = 25;
-        LttngKernelTraceGenerator gt = new LttngKernelTraceGenerator(2l * Integer.MAX_VALUE - 100, 500000, cpus);
+        LttngTraceGenerator gt = new LttngTraceGenerator(2l * Integer.MAX_VALUE - 100, 500000, cpus);
         gt.writeTrace(file);
     }
 
     /**
-     * Make a kernel trace
+     * Make a lttng trace
      *
      * @param duration
      *            the duration of the trace
@@ -350,15 +350,12 @@ public class LttngKernelTraceGenerator {
      * @param nbChannels
      *            the number of channels in the trace
      */
-    public LttngKernelTraceGenerator(long duration, long events, int nbChannels) {
-        fProcesses = Arrays.asList(sfProcesses);
-        fDuration = duration;
-        fNbEvents = events;
-        fNbChans = nbChannels;
+    public LttngTraceGenerator(long duration, long events, int nbChannels) {
+        this(duration, events, nbChannels, true);
     }
 
     /**
-     * Make a kernel trace
+     * Make a lttng trace
      *
      * @param duration
      *            the duration of the trace
@@ -366,8 +363,10 @@ public class LttngKernelTraceGenerator {
      *            the number of events in a trace
      * @param nbChannels
      *            the number of channels in the trace
+     * @param isKernel
+     *            true for kernel, false for ust
      */
-    public LttngKernelTraceGenerator(long duration, long events, int nbChannels, boolean isKernel) {
+    public LttngTraceGenerator(long duration, long events, int nbChannels, boolean isKernel) {
         fProcesses = Arrays.asList(sfProcesses);
         fDuration = duration;
         fNbEvents = events;
@@ -491,7 +490,7 @@ public class LttngKernelTraceGenerator {
             }
         }
         try (FileOutputStream fos = new FileOutputStream(metadataFile);) {
-            String metadata = fIsKernel ? metadataKernel : metadataUst;
+            String metadata = fIsKernel ? metadataKernel : getMetadataUST();
             fos.write(metadata.getBytes());
         } catch (IOException e) {
         }
@@ -525,6 +524,11 @@ public class LttngKernelTraceGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String getMetadataUST() {
+        String metadata = metadataKernel.replace("\"kernel\"", "\"ust\"");
+        return metadata.replace("lttng-modules", "lttng-ust");
     }
 
     private class EventWriter {
