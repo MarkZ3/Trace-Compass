@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests.packageexplorer;
+package org.eclipse.tracecompass.integration.swtbot.tests.packageexplorer;
 
 import static org.junit.Assert.assertTrue;
 

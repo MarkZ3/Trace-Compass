@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests.packageexplorer;
+package org.eclipse.tracecompass.integration.swtbot.tests.packageexplorer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -66,12 +66,12 @@ public class ProjectExplorerTracesFolderTest {
     private static final String LAST_MODIFIED_PROPERTY = "last modified";
     private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
 
-    private static TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
-    private static TestTraceInfo CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
-    private static TestTraceInfo LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static TestTraceInfo UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
+    private static @NonNull TestTraceInfo CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
+    private static @NonNull TestTraceInfo LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static @NonNull TestTraceInfo UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
 
 
     private static @NonNull TestTraceInfo CLASHES_CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "clashes/ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
@@ -279,48 +279,6 @@ public class ProjectExplorerTracesFolderTest {
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         testSingleTrace(LTTNG_KERNEL_TRACE, optionFlags);
     }
-
-
-    public static class TestTraceInfo {
-        private final String fTraceName;
-        private final String fTracePath;
-        private final String fTraceType;
-        private final long fNbEvents;
-        private final String fFirst;
-
-        public TestTraceInfo(String traceName, String traceType, long nbEvents, String first) {
-            this(traceName, traceName, traceType, nbEvents, first);
-        }
-
-        public TestTraceInfo(String traceName, String tracePath, String traceType, long nbEvents, String first) {
-            fTraceName = traceName;
-            fTracePath = tracePath;
-            fTraceType = traceType;
-            fNbEvents = nbEvents;
-            fFirst = first;
-        }
-
-        public String getTraceName() {
-            return fTraceName;
-        }
-
-        public String getTracePath() {
-            return fTracePath;
-        }
-
-        public String getTraceType() {
-            return fTraceType;
-        }
-
-        public long getNbEvents() {
-            return fNbEvents;
-        }
-
-        public String getFirst() {
-            return fFirst;
-        }
-    }
-
 
     @Test
     public void test3_06RenameCopyImport() {
@@ -569,8 +527,6 @@ public class ProjectExplorerTracesFolderTest {
         traceItem.select();
         traceItem.doubleClick();
     }
-
-
 
     private static void testSingleTrace(TestTraceInfo traceInfo, int optionFlags) {
         importTrace(traceInfo.getTracePath(), optionFlags);
