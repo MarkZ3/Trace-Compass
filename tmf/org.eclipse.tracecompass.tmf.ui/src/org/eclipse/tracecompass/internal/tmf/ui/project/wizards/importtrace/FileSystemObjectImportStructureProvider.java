@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -52,6 +53,13 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
         for (Object o : children) {
             adapted.add(getIFileSystemObject(o));
         }
+        adapted.sort(new Comparator<IFileSystemObject>() {
+
+            @Override
+            public int compare(IFileSystemObject o1, IFileSystemObject o2) {
+                return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+            }
+        });
         return adapted;
     }
 

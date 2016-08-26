@@ -63,7 +63,7 @@ import com.google.common.collect.ImmutableSet;
 @SuppressWarnings({"restriction", "javadoc"})
 public class ProjectExplorerTracesFolderTest {
 
-    private static final String LAST_MODIFIED_PROPERTY = "last modified";
+    private static final String PROP_LAST_MODIFIED_PROPERTY = "last modified";
     private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
 
     private static @NonNull TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
@@ -82,7 +82,7 @@ public class ProjectExplorerTracesFolderTest {
     private static @NonNull TestTraceInfo CLASHES_UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "clashes/ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
 
 
-    private static @NonNull TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
+    private static TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
             LTTNG_KERNEL_TRACE.getFirstEventTimestamp());
 
 
@@ -290,7 +290,7 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void testRenameCopyImport(TestTraceInfo traceInfo) {
-        importTrace(traceInfo.getTraceName(), ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.RENAME);
+        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.RENAME, traceInfo.getTraceName());
         String renamed = toTwo(traceInfo.getTraceName());
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), renamed);
         checkTraceType(traceItem, traceInfo.getTraceType());
@@ -309,14 +309,14 @@ public class ProjectExplorerTracesFolderTest {
     private static void testOverwriteCopyImport(TestTraceInfo traceInfo) {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        String lastModified = getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY);
-        importTrace(traceName, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.OVERWRITE);
+        String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
+        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.OVERWRITE, traceName);
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
         testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
-        assertNotEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
+        assertNotEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
     @Test
@@ -329,14 +329,14 @@ public class ProjectExplorerTracesFolderTest {
     private static void testSkipImport(TestTraceInfo traceInfo) {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        String lastModified = getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY);
-        importTrace(traceName, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.SKIP);
+        String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
+        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.SKIP, traceName);
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
         testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
-        assertEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
+        assertEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
     @Test
@@ -349,20 +349,20 @@ public class ProjectExplorerTracesFolderTest {
     private static void testOverwriteOptionImport(TestTraceInfo traceInfo) {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        String lastModified = getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY);
-        importTrace(traceName, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, ImportConfirmation.CONTINUE);
+        String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
+        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, ImportConfirmation.CONTINUE, traceName);
         traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, traceInfo.getTraceType());
         openTrace(traceItem);
         testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
         checkTraceLinked(traceItem, false);
-        assertNotEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
+        assertNotEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
     @Test
     public void test3_10ImportUnrecognized() {
         String traceName = UNRECOGNIZED_LOG.getTraceName();
-        importTrace(traceName, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE);
+        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE, traceName);
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
         checkTraceLinked(traceItem, true);
@@ -379,11 +379,11 @@ public class ProjectExplorerTracesFolderTest {
         int numTraces = tracesFolderItem.getItems().length;
 
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-        String lastModified = getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY);
-        importTrace(traceName, ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE);
+        String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
+        importTrace(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE, traceName);
         traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
 
-        assertEquals(lastModified, getTraceProperty(traceItem, LAST_MODIFIED_PROPERTY));
+        assertEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
         assertEquals(numTraces, tracesFolderItem.getItems().length);
     }
 
@@ -400,7 +400,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-        importTrace("", optionFlags, ImportConfirmation.RENAME_ALL);
+        importTrace(optionFlags, ImportConfirmation.RENAME_ALL, "");
 
         for (TestTraceInfo info : ALL_TRACEINFOS) {
             String traceName = info.getTraceName();
@@ -428,7 +428,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-        importTrace("", optionFlags, ImportConfirmation.OVERWRITE_ALL);
+        importTrace(optionFlags, ImportConfirmation.OVERWRITE_ALL, "");
 
         SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         for (TestTraceInfo info : CLASHING_TRACEINFOS) {
@@ -461,7 +461,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-        importTrace("", optionFlags, ImportConfirmation.SKIP_ALL);
+        importTrace(optionFlags, ImportConfirmation.SKIP_ALL, "");
 
         SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         for (TestTraceInfo info : CLASHING_TRACEINFOS) {
@@ -489,37 +489,88 @@ public class ProjectExplorerTracesFolderTest {
     /**
      * TODO: Need a way to differentiate skip and overwrite results
      */
-//    @Test
-//    public void test3_16ImportRecursiveAutoRenameOverwriteSkip() {
-//        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
-//
-//        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-//        importTrace("", optionFlags, ImportConfirmation.SKIP_ALL);
-//
-//        ImportConfirmation dialogConfirmationOrder[] = new ImportConfirmation[] { ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP };
-//
-//        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+    @Test
+    public void test3_16ImportRecursiveAutoRenameOverwriteSkip() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        ImportConfirmation dialogConfirmationOrder[] = new ImportConfirmation[] { ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP };
+        importTrace(optionFlags, new Supplier<ImportConfirmation>() {
+            int responseNum = 0;
+
+            @Override
+            public ImportConfirmation get() {
+                if (responseNum >= dialogConfirmationOrder.length) {
+                    return null;
+                }
+
+                ImportConfirmation confirmation = dialogConfirmationOrder[responseNum];
+                responseNum++;
+                return confirmation;
+            }
+        }, LTTNG_KERNEL_TRACE.getTracePath(),
+                CLASHES_LTTNG_KERNEL_TRACE.getTracePath(),
+                SIMPLE_SERVER1_UST_TRACE.getTracePath(),
+                CLASHES_SIMPLE_SERVER1_UST_TRACE.getTracePath(),
+                SIMPLE_SERVER2_UST_TRACE.getTracePath(),
+                CLASHES_SIMPLE_SERVER2_UST_TRACE.getTracePath(),
+                UNRECOGNIZED_LOG.getTracePath());
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 //        for (TestTraceInfo info : CLASHING_TRACEINFOS) {
 //            String traceName = info.getTraceName();
 //
 //            SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
 //            checkTraceType(traceItem, info.getTraceType());
 //            openTrace(traceItem);
-//            testEventsTable(traceName, info.getNbEvents(), info.getFirst());
+//            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
 //        }
-//
-//        // All traces should have clashed/overwritten plus the unrecognized trace
-//        assertEquals(CLASHING_TRACEINFOS.size() + 1, tracesFolderItem.getItems().length);
-//
-//        // Also check unrecognized file
-//        String traceName = UNRECOGNIZED_LOG.getTraceName();
-//        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-//        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-//        openTrace(traceItem);
-//        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-//        SWTBotEditor editor = fBot.editorByTitle(traceName);
-//        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
-//    }
+
+        TestTraceInfo traceInfo = LTTNG_KERNEL_TRACE;
+        String traceName = traceInfo.getTraceName();
+        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
+        checkTraceType(traceItem, traceInfo.getTraceType());
+        openTrace(traceItem);
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        checkTraceLinked(traceItem, true);
+
+        // Renamed trace
+        String renamed = toTwo(traceInfo.getTraceName());
+        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), renamed);
+        checkTraceType(traceItem, traceInfo.getTraceType());
+        openTrace(traceItem);
+        testEventsTable(renamed, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        checkTraceLinked(traceItem, true);
+
+        // Overwritten trace
+        //TODO: distinguish overwritten from skipped
+        traceInfo = SIMPLE_SERVER1_UST_TRACE;
+        traceName = traceInfo.getTraceName();
+        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
+        checkTraceType(traceItem, traceInfo.getTraceType());
+        openTrace(traceItem);
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        checkTraceLinked(traceItem, true);
+
+        // Skipped trace
+        //TODO: distinguish overwritten from skipped
+        traceInfo = SIMPLE_SERVER2_UST_TRACE;
+        traceName = traceInfo.getTraceName();
+        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
+        checkTraceType(traceItem, traceInfo.getTraceType());
+        openTrace(traceItem);
+        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        checkTraceLinked(traceItem, true);
+
+        // Also check unrecognized file
+        traceName = UNRECOGNIZED_LOG.getTraceName();
+        traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
+        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
+        openTrace(traceItem);
+        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
+        SWTBotEditor editor = fBot.editorByTitle(traceName);
+        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+    }
 
     private static String toTwo(String traceName) {
         return traceName + "(2)";
@@ -531,7 +582,7 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void testSingleTrace(TestTraceInfo traceInfo, int optionFlags) {
-        importTrace(traceInfo.getTracePath(), optionFlags);
+        importTrace(optionFlags, traceInfo.getTracePath());
 
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceInfo.getTraceName());
         checkTraceType(traceItem, traceInfo.getTraceType());
@@ -540,42 +591,62 @@ public class ProjectExplorerTracesFolderTest {
         testEventsTable(traceInfo.getTraceName(), traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
     }
 
-    private static void importTrace(String traceName, int optionFlags) {
-        importTrace(traceName, optionFlags, ImportConfirmation.CONTINUE);
+    private static void importTrace(int optionFlags, String ... tracePaths) {
+        importTrace(optionFlags, ImportConfirmation.CONTINUE, tracePaths);
     }
 
-    private static void importTrace(String tracePath, int optionFlags, ImportConfirmation confirmationMode) {
-        importTrace(tracePath, optionFlags, () -> confirmationMode);
+    private static void importTrace(int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
+        importTrace(optionFlags, new Supplier<ImportConfirmation>() {
+            boolean fDone = false;
+            @Override
+            public ImportConfirmation get() {
+                if (fDone) {
+                    return null;
+                }
+                fDone = true;
+                return confirmationMode;
+            }
+        }, tracePaths);
     }
 
     /**
      * @param tracePath relative to parent test traces folder
      */
-    private static void importTrace(String tracePath, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier) {
+    private static void importTrace(int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
         SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 
         SWTBotShell shell = openTraceFoldersImport(traceFolder);
         SWTBot bot = shell.bot();
         final String importDirectoryRelativePath = "import";
         String importDirectoryFullPath = getPath(importDirectoryRelativePath);
-        IPath somePath = new Path(importDirectoryRelativePath).append(tracePath);
-        IPath fullParentPath = somePath.removeLastSegments(1);
-        boolean isDirectory = new Path(importDirectoryFullPath).append(tracePath).toFile().isDirectory();
 
-        SWTBotImportWizardUtils.selectImportFromDirectory(bot, importDirectoryFullPath);
-        if (isDirectory) {
-            SWTBotImportWizardUtils.selectFolder(fBot, true, somePath.segments());
-        } else {
-            SWTBotImportWizardUtils.selectFile(bot, new Path(tracePath).lastSegment(), fullParentPath.segments());
+        for (String tracePath : tracePaths) {
+            IPath somePath = new Path(importDirectoryRelativePath).append(tracePath);
+            IPath fullParentPath = somePath.removeLastSegments(1);
+            boolean isDirectory = new Path(importDirectoryFullPath).append(tracePath).toFile().isDirectory();
+
+            SWTBotImportWizardUtils.selectImportFromDirectory(bot, importDirectoryFullPath);
+            if (isDirectory) {
+                SWTBotImportWizardUtils.selectFolder(fBot, true, somePath.segments());
+            } else {
+                SWTBotImportWizardUtils.selectFile(bot, new Path(tracePath).lastSegment(), fullParentPath.segments());
+            }
         }
+
         SWTBotImportWizardUtils.setOptions(bot, optionFlags, null);
         bot.button("Finish").click();
-        if (confirmationSuplier.get() != ImportConfirmation.CONTINUE) {
-            fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
-            SWTBotShell shell2 = fBot.activeShell();
-            SWTBotButton button = shell2.bot().button(confirmationSuplier.get().getInName());
-            button.click();
+
+        ImportConfirmation importConfirmation = confirmationSuplier.get();
+        while (importConfirmation != null) {
+            if (importConfirmation != ImportConfirmation.CONTINUE) {
+                fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
+                SWTBotShell shell2 = fBot.activeShell();
+                SWTBotButton button = shell2.bot().button(importConfirmation.getInName());
+                button.click();
+            }
+            importConfirmation = confirmationSuplier.get();
         }
+
         fBot.waitUntil(Conditions.shellCloses(shell));
     }
 
