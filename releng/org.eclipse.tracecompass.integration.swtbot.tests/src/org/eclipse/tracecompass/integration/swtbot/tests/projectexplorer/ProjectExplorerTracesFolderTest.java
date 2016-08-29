@@ -30,10 +30,8 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
@@ -66,29 +64,34 @@ public class ProjectExplorerTracesFolderTest {
     private static final String PROP_LAST_MODIFIED_PROPERTY = "last modified";
     private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
 
-    private static @NonNull TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
-    private static @NonNull TestTraceInfo CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
-    private static @NonNull TestTraceInfo LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static final String GENERIC_CTF_TRACE_TYPE = "Common Trace Format : Generic CTF Trace";
+    private static final String LTTNG_KERNEL_TRACE_TYPE = "Common Trace Format : Linux Kernel Trace";
+    private static final String LTTNG_UST_TRACE_TYPE = "Common Trace Format : LTTng UST Trace";
+    private static final String CUSTOM_TEXT_TRACE_TYPE = "Custom Text : TmfGeneric";
+    private static final String CUSTOM_XML_TRACE_TYPE = "Custom XML : Custom XML Log";
+
+    private static final @NonNull TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", CUSTOM_TEXT_TRACE_TYPE, 10, "29:52.034");
+    private static final @NonNull TestTraceInfo CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", CUSTOM_XML_TRACE_TYPE, 6, "22:01:20");
+    private static final @NonNull TestTraceInfo LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", LTTNG_KERNEL_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
 
 
-    private static @NonNull TestTraceInfo CLASHES_CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "clashes/ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
-    private static @NonNull TestTraceInfo CLASHES_CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "clashes/ExampleCustomXml.xml", "Custom XML : Custom XML Log", 6, "22:01:20");
-    private static @NonNull TestTraceInfo CLASHES_LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "clashes/kernel-overlap-testing", "Common Trace Format : Linux Kernel Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "clashes/simple_server-thread1", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "clashes/simple_server-thread2", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
-    private static @NonNull TestTraceInfo CLASHES_UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "clashes/ust-overlap-testing", "Common Trace Format : LTTng UST Trace", 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo CLASHES_CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "clashes/ExampleCustomTxt.log", CUSTOM_TEXT_TRACE_TYPE, 10, "29:52.034");
+    private static final @NonNull TestTraceInfo CLASHES_CUSTOM_XML_LOG = new TestTraceInfo("ExampleCustomXml.xml", "clashes/ExampleCustomXml.xml", CUSTOM_XML_TRACE_TYPE, 6, "22:01:20");
+    private static final @NonNull TestTraceInfo CLASHES_LTTNG_KERNEL_TRACE = new TestTraceInfo("kernel-overlap-testing", "clashes/kernel-overlap-testing", LTTNG_KERNEL_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER1_UST_TRACE = new TestTraceInfo("simple_server-thread1", "clashes/simple_server-thread1", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo CLASHES_SIMPLE_SERVER2_UST_TRACE = new TestTraceInfo("simple_server-thread2", "clashes/simple_server-thread2", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
+    private static final @NonNull TestTraceInfo CLASHES_UST_OVERLAP_TESTING_UST_TRACE = new TestTraceInfo("ust-overlap-testing", "clashes/ust-overlap-testing", LTTNG_UST_TRACE_TYPE, 1000, "04:32.650 993 664");
 
 
-    private static TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
+    private static final @NonNull TestTraceInfo LTTNG_KERNEL_TRACE_METADATA = new TestTraceInfo(LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE.getTraceName() + "/metadata", LTTNG_KERNEL_TRACE.getTraceType(), LTTNG_KERNEL_TRACE.getNbEvents(),
             LTTNG_KERNEL_TRACE.getFirstEventTimestamp());
+    private static final @NonNull TestTraceInfo UNRECOGNIZED_LOG = new TestTraceInfo("unrecognized.log", "", 0, "");
+    private static final @NonNull TestTraceInfo CUSTOM_XML_LOG_AS_TEXT = new TestTraceInfo("ExampleCustomXml.xml", CUSTOM_TEXT_TRACE_TYPE, 0, "");
 
-
-    private static TestTraceInfo UNRECOGNIZED_LOG = new TestTraceInfo("unrecognized.log", "", 0, "");
-
-    private static TestTraceInfo[] ALL_TRACEINFOS = new TestTraceInfo[] {
+    private static final TestTraceInfo[] ALL_TRACEINFOS = new TestTraceInfo[] {
             CUSTOM_TEXT_LOG,
             CUSTOM_XML_LOG,
             LTTNG_KERNEL_TRACE,
@@ -104,13 +107,16 @@ public class ProjectExplorerTracesFolderTest {
             CLASHES_UST_OVERLAP_TESTING_UST_TRACE
     };
 
-    private Set<TestTraceInfo> CLASHING_TRACEINFOS = ImmutableSet.of(
+    private static final Set<TestTraceInfo> CLASHING_TRACEINFOS = ImmutableSet.of(
             CLASHES_CUSTOM_TEXT_LOG,
             CLASHES_CUSTOM_XML_LOG,
             CLASHES_LTTNG_KERNEL_TRACE,
             CLASHES_SIMPLE_SERVER1_UST_TRACE,
             CLASHES_SIMPLE_SERVER2_UST_TRACE,
             CLASHES_UST_OVERLAP_TESTING_UST_TRACE);
+
+    // All normal traces plus the unrecognized trace
+    private static final int NUM_UNIQUE_TRACES = CLASHING_TRACEINFOS.size() + 1;
 
 
     private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
@@ -128,6 +134,7 @@ public class ProjectExplorerTracesFolderTest {
 
     /**
      * Test Class setup
+     *
      * @throws IOException
      */
     @BeforeClass
@@ -162,7 +169,6 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void test3_01Preparation() {
-
         // FIXME: We can't use Manage Custom Parsers > Import because it uses a native dialog. We'll still check that they show up in the dialog
         CustomTxtTraceDefinition[] txtDefinitions = CustomTxtTraceDefinition.loadAll(getPath("customParsers/ExampleCustomTxtParser.xml"));
         txtDefinitions[0].save();
@@ -183,7 +189,6 @@ public class ProjectExplorerTracesFolderTest {
         shellBot.list().select(CUSTOM_XML_LOG.getTraceType());
         shellBot.button("Close").click();
         shellBot.waitUntil(Conditions.shellCloses(shell));
-
     }
 
     /**
@@ -194,7 +199,6 @@ public class ProjectExplorerTracesFolderTest {
      * Procedure :Select the Traces folder and open its context menu
      * <p>
      * Expected Results: Correct menu opens (Import, Refresh, etc)
-     *
      */
     @Test
     public void test3_01ContextMenuPresence() {
@@ -239,7 +243,6 @@ public class ProjectExplorerTracesFolderTest {
      * Procedure : Select Import
      * <p>
      * Expected Results: Trace Import Wizard appears
-     *
      */
     @Test
     public void test3_02Import() {
@@ -261,8 +264,7 @@ public class ProjectExplorerTracesFolderTest {
      *             4) press Finish
      * </pre>
      * <p>
-     * Expected Results: Trace Import Wizard appears
-     *
+     * Expected Results: Imported trace appear in Traces Folder and the Trace Type Tmf Generic is set. Make sure trace can be opened
      */
     @Test
     public void test3_03SingleCustomTextTrace() {
@@ -270,18 +272,55 @@ public class ProjectExplorerTracesFolderTest {
         testSingleTrace(CUSTOM_TEXT_LOG, optionFlags);
     }
 
+    /**
+     * <p>
+     * Action : Import Single custom XML trace (link to workspace)
+     * <p>
+     *
+     * <pre>
+     * Procedure : redo 3.1-3.3 but this time select ExampleCustomXml.xml
+     * </pre>
+     * <p>
+     * Expected Results: Imported trace appear in Traces Folder and the Trace
+     * Type "Custom XML log" is set. Make sure that trace can be opened
+     */
     @Test
     public void test3_04SingleCustomXmlTrace() {
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         testSingleTrace(CUSTOM_XML_LOG, optionFlags);
     }
 
+    /**
+     * <p>
+     * Action : Import LTTng Kernel CTF trace (link to workspace)
+     * <p>
+     *
+     * <pre>
+     * Procedure : redo 3.1-3.3 but this time select directory kernel-overlap-testing/
+     * </pre>
+     * <p>
+     * Expected Results: Imported trace appear in Traces Folder and the Trace
+     * Type "LTTng Kernel" is set. Make sure that trace can be opened
+     */
     @Test
     public void test3_05SingleCtfTrace() {
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         testSingleTrace(LTTNG_KERNEL_TRACE, optionFlags);
     }
 
+    /**
+     * <p>
+     * Action : Rename + copy import
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) redo 3.3, 3.4, 3.5. However, Unselect "Create Links to workspace"
+     *             2) When dialog box appear select Rename
+     * </pre>
+     * <p>
+     * Expected Results: Traces are imported with new name that has a suffix (2)
+     * at the end. Make sure that imported traces are copied to the project.
+     */
     @Test
     public void test3_06RenameCopyImport() {
         testRenameCopyImport(CUSTOM_TEXT_LOG);
@@ -290,15 +329,26 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void testRenameCopyImport(TestTraceInfo traceInfo) {
-        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.RENAME, traceInfo.getTraceName());
-        String renamed = toTwo(traceInfo.getTraceName());
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), renamed);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(renamed, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, false);
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES;
+        importTrace(optionFlags, ImportConfirmation.RENAME, traceInfo.getTraceName());
+        String renamed = toRenamedName(traceInfo.getTraceName());
+        verifyTrace(traceInfo, optionFlags, renamed);
     }
 
+    /**
+     * <p>
+     * Action : Overwrite + copy import
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) redo 3.3, 3.4, 3.5. However, Unselect "Create Links to workspace"
+     *             2) When dialog box appear select Overwrite
+     * </pre>
+     * <p>
+     * Expected Results: Existing traces are deleted and new traces are
+     * imported. Make sure that imported traces are copied to the project and
+     * can be opened
+     */
     @Test
     public void test3_07OverwriteCopyImport() {
         testOverwriteCopyImport(CUSTOM_TEXT_LOG);
@@ -310,15 +360,25 @@ public class ProjectExplorerTracesFolderTest {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
-        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.OVERWRITE, traceName);
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, false);
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES;
+        importTrace(optionFlags, ImportConfirmation.OVERWRITE, traceName);
+        verifyTrace(traceInfo, optionFlags);
+
         assertNotEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
+    /**
+     * <p>
+     * Action : Skip
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) redo 3.3, 3.4, 3.5. However, Unselect "Create Links to workspace"
+     *             2) When dialog box appear select Skip
+     * </pre>
+     * <p>
+     * Expected Results: Make sure that no new trace is imported
+     */
     @Test
     public void test3_08SkipImport() {
         testSkipImport(CUSTOM_TEXT_LOG);
@@ -330,15 +390,26 @@ public class ProjectExplorerTracesFolderTest {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
-        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportConfirmation.SKIP, traceName);
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, false);
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES;
+        importTrace(optionFlags, ImportConfirmation.SKIP, traceName);
+        verifyTrace(traceInfo, optionFlags);
+
         assertEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
+    /**
+     * <p>
+     * Action : Default overwrite
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) redo 3.3, 3.4, 3.5. However, Unselect "Create Links to workspace" and select "Overwrite existing without warning"
+     * </pre>
+     * <p>
+     * Expected Results: Make sure that no dialog box appears (for renaming,
+     * overwriting, skipping) and existing traces are overwritten). Make sure
+     * trace can be opened
+     */
     @Test
     public void test3_09OverwriteOptionImport() {
         testOverwriteOptionImport(CUSTOM_TEXT_LOG);
@@ -350,28 +421,50 @@ public class ProjectExplorerTracesFolderTest {
         String traceName = traceInfo.getTraceName();
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
         String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
-        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, ImportConfirmation.CONTINUE, traceName);
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, false);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES;
+        importTrace(optionFlags, ImportConfirmation.CONTINUE, traceName);
+        verifyTrace(traceInfo, optionFlags);
+
         assertNotEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
     }
 
+    /**
+     * <p>
+     * Action : Import unrecognized
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import
+     *             3) Select trace unrecognized.log
+     *             4) Keep <Auto Detection>, Select "Import unrecognized traces", unselect  "Overwrite existing without warning" and select "Create Links to workspace" and
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: unrecognized.log is imported with trace type unknown.
+     * The default text file icon is displayed. The trace, when opened, is
+     * displayed in the text editor.
+     */
     @Test
     public void test3_10ImportUnrecognized() {
         String traceName = UNRECOGNIZED_LOG.getTraceName();
-        importTrace(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE, traceName);
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-        checkTraceLinked(traceItem, true);
-        openTrace(traceItem);
-        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-        SWTBotEditor editor = fBot.editorByTitle(traceName);
-        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(optionFlags, traceName);
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
     }
 
+    /**
+     * <p>
+     * Action : Import unrecognized (ignore)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) redo 3.10, however unselect "Import unrecognized traces"
+     * </pre>
+     * <p>
+     * Expected Results: unrecognized.log is not imported
+     */
     @Test
     public void test3_11ImportUnrecognizedIgnore() {
         String traceName = UNRECOGNIZED_LOG.getTraceName();
@@ -380,23 +473,56 @@ public class ProjectExplorerTracesFolderTest {
 
         SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
         String lastModified = getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY);
-        importTrace(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE, traceName);
-        traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(optionFlags, traceName);
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
 
         assertEquals(lastModified, getTraceProperty(traceItem, PROP_LAST_MODIFIED_PROPERTY));
         assertEquals(numTraces, tracesFolderItem.getItems().length);
     }
 
+    /**
+     * <p>
+     * Action : Import CTF trace by selection metadata file only
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Redo 3.5, However only select metadata file instead of directory trace
+     * </pre>
+     * <p>
+     * Expected Results: Imported trace appear in Traces Folder and the Trace
+     * Type "LTTng Kernel" is set. Make sure that trace can be opened
+     */
     @Test
     public void test3_12ImportCtfWithMetadataSelection() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
-
-        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-        testSingleTrace(LTTNG_KERNEL_TRACE_METADATA, optionFlags);
+        testSingleTrace(LTTNG_KERNEL_TRACE_METADATA, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE);
     }
 
+    /**
+     * <p>
+     * Action : Recursive import with auto-detection (Rename All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import
+     *             3) select directory import
+     *             4) Keep <Auto Detection>, Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Rename All"
+     * </pre>
+     * <p>
+     * Expected Results: All Traces are imported with respective trace type set.
+     * Traces with name clashes are imported with suffix (2). 1 trace
+     * (unrecognized.log) is imported with trace type unknown. Make sure that
+     * traces can be opened which have a trace type set. The unknown trace type
+     * should open with the text editor.
+     */
     @Test
     public void test3_13ImportRecursiveAutoRenameAll() {
+        test3_01Preparation();
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -405,24 +531,35 @@ public class ProjectExplorerTracesFolderTest {
         for (TestTraceInfo info : ALL_TRACEINFOS) {
             String traceName = info.getTraceName();
             if (CLASHING_TRACEINFOS.contains(info)) {
-                traceName = toTwo(traceName);
+                traceName = toRenamedName(traceName);
             }
-            SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-            checkTraceType(traceItem, info.getTraceType());
-            openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
+            verifyTrace(info, optionFlags, traceName);
         }
 
         // Also check unrecognized file
-        String traceName = UNRECOGNIZED_LOG.getTraceName();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-        openTrace(traceItem);
-        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-        SWTBotEditor editor = fBot.editorByTitle(traceName);
-        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
     }
 
+    /**
+     * <p>
+     * Action : Recursive import with auto-detection (Overwrite All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) select directory import
+     *             4) Keep <Auto Detection>, Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select Overwrite All"
+     * </pre>
+     * <p>
+     * Expected Results: All Traces are imported with respective trace type set.
+     * Traces with name clashes are overwritten . 1 trace (unrecognized.log) is
+     * imported with trace type unknown. Make sure that traces can be opened
+     * which have a trace type set. The unknown trace type should open with the
+     * text editor.
+     */
     @Test
     public void test3_14ImportRecursiveAutoOverwriteAll() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
@@ -430,30 +567,37 @@ public class ProjectExplorerTracesFolderTest {
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         importTrace(optionFlags, ImportConfirmation.OVERWRITE_ALL, "");
 
-        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         for (TestTraceInfo info : CLASHING_TRACEINFOS) {
-            String traceName = info.getTraceName();
-
-            SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-            checkTraceType(traceItem, info.getTraceType());
-            openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
+            verifyTrace(info, optionFlags);
         }
 
-        // All traces should have clashed/overwritten plus the unrecognized trace
-        assertEquals(CLASHING_TRACEINFOS.size() + 1, tracesFolderItem.getItems().length);
+        // All traces should have clashed/overwritten (plus the unrecognized trace)
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(NUM_UNIQUE_TRACES, tracesFolderItem.getItems().length);
 
         // Also check unrecognized file
-        String traceName = UNRECOGNIZED_LOG.getTraceName();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-        openTrace(traceItem);
-        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-        SWTBotEditor editor = fBot.editorByTitle(traceName);
-        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
     }
 
     /**
+     * <p>
+     * Action : Recursive import with auto-detection (Skip All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) select directory import
+     *             4) Keep <Auto Detection>, Select "Import unrecognized traces", unselect  "Overwrite existing without warning" and select "Create Links to workspace" and uncheck "preserve folder structure"
+     *             5) press Finish
+     *             6) When dialog appears select Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: All Traces are imported with respective trace type set. Traces with name
+     * clashes are not imported. 1 trace (unrecognized.log) is imported with
+     * trace type unknown. The unknown trace type should open with the text
+     * editor.
+     *
      * TODO: Need a way to differentiate skip and overwrite results
      */
     @Test
@@ -465,114 +609,251 @@ public class ProjectExplorerTracesFolderTest {
 
         SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         for (TestTraceInfo info : CLASHING_TRACEINFOS) {
-            String traceName = info.getTraceName();
-
-            SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-            checkTraceType(traceItem, info.getTraceType());
-            openTrace(traceItem);
-            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
+            verifyTrace(info, optionFlags);
         }
 
-        // All traces should have clashed/overwritten plus the unrecognized trace
-        assertEquals(CLASHING_TRACEINFOS.size() + 1, tracesFolderItem.getItems().length);
+        // All traces should have clashed/overwritten (plus the unrecognized trace)
+        assertEquals(NUM_UNIQUE_TRACES, tracesFolderItem.getItems().length);
 
         // Also check unrecognized file
-        String traceName = UNRECOGNIZED_LOG.getTraceName();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-        openTrace(traceItem);
-        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-        SWTBotEditor editor = fBot.editorByTitle(traceName);
-        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
     }
 
     /**
-     * TODO: Need a way to differentiate skip and overwrite results
+     * <p>
+     * Action : Recursive import with auto-detection (test rename, overwrite and
+     * skip)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) select directory import
+     *             4) Keep <Auto Detection>, Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Rename"
+     *             7) When dialog appears select "Overwrite"
+     *             8) When dialog appears select "Skip"
+     * </pre>
+     * <p>
+     * Expected Results: All Traces are imported with respective trace type set. Traces with name
+     * clashes are either renamed, overwritten or skipped as per dialog action.
+     * Make sure that traces can be opened which have trace type set. The
+     * unknown trace type should open with the text editor.
      */
     @Test
     public void test3_16ImportRecursiveAutoRenameOverwriteSkip() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
-        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-        ImportConfirmation dialogConfirmationOrder[] = new ImportConfirmation[] { ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP };
-        importTrace(optionFlags, new Supplier<ImportConfirmation>() {
-            int responseNum = 0;
+        Supplier<ImportConfirmation> confirmationSupplier = new Supplier<ImportConfirmation>() {
+            final ImportConfirmation dialogConfirmationOrder[] = new ImportConfirmation[] { ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP };
+            int fRsponseNum = 0;
 
             @Override
             public ImportConfirmation get() {
-                if (responseNum >= dialogConfirmationOrder.length) {
+                if (fRsponseNum >= dialogConfirmationOrder.length) {
                     return null;
                 }
 
-                ImportConfirmation confirmation = dialogConfirmationOrder[responseNum];
-                responseNum++;
+                ImportConfirmation confirmation = dialogConfirmationOrder[fRsponseNum];
+                fRsponseNum++;
                 return confirmation;
             }
-        }, LTTNG_KERNEL_TRACE.getTracePath(),
-                CLASHES_LTTNG_KERNEL_TRACE.getTracePath(),
-                SIMPLE_SERVER1_UST_TRACE.getTracePath(),
-                CLASHES_SIMPLE_SERVER1_UST_TRACE.getTracePath(),
-                SIMPLE_SERVER2_UST_TRACE.getTracePath(),
-                CLASHES_SIMPLE_SERVER2_UST_TRACE.getTracePath(),
-                UNRECOGNIZED_LOG.getTracePath());
+        };
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(optionFlags, confirmationSupplier, LTTNG_KERNEL_TRACE.getTracePath(), CLASHES_LTTNG_KERNEL_TRACE.getTracePath(), SIMPLE_SERVER1_UST_TRACE.getTracePath(), CLASHES_SIMPLE_SERVER1_UST_TRACE.getTracePath(),
+                SIMPLE_SERVER2_UST_TRACE.getTracePath(), CLASHES_SIMPLE_SERVER2_UST_TRACE.getTracePath(), UNRECOGNIZED_LOG.getTracePath());
 
-        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
-//        for (TestTraceInfo info : CLASHING_TRACEINFOS) {
-//            String traceName = info.getTraceName();
-//
-//            SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-//            checkTraceType(traceItem, info.getTraceType());
-//            openTrace(traceItem);
-//            testEventsTable(traceName, info.getNbEvents(), info.getFirstEventTimestamp());
-//        }
-
-        TestTraceInfo traceInfo = LTTNG_KERNEL_TRACE;
-        String traceName = traceInfo.getTraceName();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, true);
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags);
 
         // Renamed trace
-        String renamed = toTwo(traceInfo.getTraceName());
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), renamed);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(renamed, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, true);
+        String renamed = toRenamedName(LTTNG_KERNEL_TRACE.getTraceName());
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, renamed);
 
         // Overwritten trace
-        //TODO: distinguish overwritten from skipped
-        traceInfo = SIMPLE_SERVER1_UST_TRACE;
-        traceName = traceInfo.getTraceName();
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, true);
+        verifyTrace(SIMPLE_SERVER1_UST_TRACE, optionFlags);
 
         // Skipped trace
         //TODO: distinguish overwritten from skipped
-        traceInfo = SIMPLE_SERVER2_UST_TRACE;
-        traceName = traceInfo.getTraceName();
-        traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
-        checkTraceType(traceItem, traceInfo.getTraceType());
-        openTrace(traceItem);
-        testEventsTable(traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
-        checkTraceLinked(traceItem, true);
+        verifyTrace(SIMPLE_SERVER2_UST_TRACE, optionFlags);
 
         // Also check unrecognized file
-        traceName = UNRECOGNIZED_LOG.getTraceName();
-        traceItem = SWTBotUtils.getTreeItem(fBot, tracesFolderItem, traceName);
-        checkTraceType(traceItem, UNRECOGNIZED_LOG.getTraceType());
-        openTrace(traceItem);
-        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
-        SWTBotEditor editor = fBot.editorByTitle(traceName);
-        assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags);
     }
 
-    private static String toTwo(String traceName) {
+    /**
+     * <p>
+     * Action : Recursive import with specific trace type 1 (Skip All) skip)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "Generic CTF Trace", Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"and
+     *             5) press Finish
+     *             6) When dialog appears select Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: After selecting trace type, verify that button "Import
+     * unrecognized traces" is disabled. 4 CTF traces are imported with trace
+     * type "Generic CTF Trace" . Make sure that these traces can be opened
+     */
+    @Test
+    public void test3_17ImportRecursiveSpecityTraceTypeCTF() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(GENERIC_CTF_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
+
+        final TestTraceInfo[] CTF_TRACEINFOS = new TestTraceInfo[] {
+                LTTNG_KERNEL_TRACE,
+                SIMPLE_SERVER1_UST_TRACE,
+                SIMPLE_SERVER2_UST_TRACE,
+                UST_OVERLAP_TESTING_UST_TRACE
+        };
+        for (TestTraceInfo info : CTF_TRACEINFOS) {
+            verifyTrace(info, optionFlags, info.getTraceName(), GENERIC_CTF_TRACE_TYPE);
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(CTF_TRACEINFOS.length, tracesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Recursive import with specific trace type 2 (Skip All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "LTTng Kernel Trace", Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) Press Finish
+     *             6) When dialog appears select Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: After selecting trace type, verify that button "Import
+     * unrecognized traces" is disabled. One LTTng Kernel trace is imported with
+     * trace type "LTTng Kernel Trace". Make sure that this trace can be opened.
+     */
+    @Test
+    public void test3_18ImportRecursiveSpecityTraceTypeKernel() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(LTTNG_KERNEL_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
+
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags);
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(1, tracesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Recursive import with specific trace type 3 (Skip All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "LTTng UST Trace", Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) Press Finish
+     *             6) When dialog appears select Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: After selecting trace type, verify that button "Import
+     * unrecognized traces" is disabled. 3 LTTng UST traces are imported with
+     * trace type "LTTng UST Trace". Make sure that these traces can be opened.
+     */
+    @Test
+    public void test3_19ImportRecursiveSpecityTraceTypeUST() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(LTTNG_UST_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
+
+        final TestTraceInfo[] UST_TRACEINFOS = new TestTraceInfo[] {
+                SIMPLE_SERVER1_UST_TRACE,
+                SIMPLE_SERVER2_UST_TRACE,
+                UST_OVERLAP_TESTING_UST_TRACE
+        };
+        for (TestTraceInfo info : UST_TRACEINFOS) {
+            verifyTrace(info, optionFlags);
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(UST_TRACEINFOS.length, tracesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Recursive import with specific trace type 4 (Skip All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard (see 3.1-3.2)
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) select directory import
+     *             4) Select trace type "Tmf Generic", Select "Import unrecognized traces", unselect  "Overwrite existing without warning", select "Create Links to workspace" and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: All text files in directories are imported as trace and
+     * trace type "Tmf Generic" is set. Note that trace type validation only
+     * checks for file exists and that file is not a directory. Make sure that
+     * these traces can be opened. However traces with wrong trace type won't
+     * show any events in the table.
+     */
+    @Test
+    public void test3_20ImportRecursiveSpecityTraceTypeCustomText() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags);
+
+        final TestTraceInfo[] TEXT_BASED_TRACEINFOS = new TestTraceInfo[] {
+                CUSTOM_TEXT_LOG,
+                CUSTOM_XML_LOG_AS_TEXT,
+                UNRECOGNIZED_LOG
+        };
+        for (TestTraceInfo info : TEXT_BASED_TRACEINFOS) {
+            verifyTrace(info, optionFlags, info.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(TEXT_BASED_TRACEINFOS.length, tracesFolderItem.getItems().length);
+    }
+
+    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags) {
+        verifyTrace(traceInfo, importOptionFlags, traceInfo.getTraceName());
+    }
+
+    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName) {
+        verifyTrace(traceInfo, importOptionFlags, traceName, traceInfo.getTraceType());
+    }
+
+    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName, String traceType) {
+        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
+        checkTraceType(traceItem, traceType);
+        openTrace(traceItem);
+        if (traceType != null && !traceType.isEmpty()) {
+            SWTBotImportWizardUtils.testEventsTable(fBot, traceName, traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        } else {
+            // If there is no trace type, make sure it can be opened with the text editor
+            fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, traceName));
+            SWTBotEditor editor = fBot.editorByTitle(traceName);
+            assertEquals(TEXT_EDITOR_ID, editor.getReference().getId());
+        }
+        checkTraceLinked(traceItem, (importOptionFlags & ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE) != 0);
+    }
+
+    private static String toRenamedName(String traceName) {
         return traceName + "(2)";
     }
 
@@ -583,12 +864,7 @@ public class ProjectExplorerTracesFolderTest {
 
     private static void testSingleTrace(TestTraceInfo traceInfo, int optionFlags) {
         importTrace(optionFlags, traceInfo.getTracePath());
-
-        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceInfo.getTraceName());
-        checkTraceType(traceItem, traceInfo.getTraceType());
-
-        openTrace(traceItem);
-        testEventsTable(traceInfo.getTraceName(), traceInfo.getNbEvents(), traceInfo.getFirstEventTimestamp());
+        verifyTrace(traceInfo, optionFlags);
     }
 
     private static void importTrace(int optionFlags, String ... tracePaths) {
@@ -596,7 +872,11 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void importTrace(int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
-        importTrace(optionFlags, new Supplier<ImportConfirmation>() {
+        importTrace(null, optionFlags, confirmationMode, tracePaths);
+    }
+
+    private static void importTrace(String traceType, int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
+        importTrace(traceType, optionFlags, new Supplier<ImportConfirmation>() {
             boolean fDone = false;
             @Override
             public ImportConfirmation get() {
@@ -609,10 +889,14 @@ public class ProjectExplorerTracesFolderTest {
         }, tracePaths);
     }
 
+    private static void importTrace(int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
+        importTrace(null, optionFlags, confirmationSuplier, tracePaths);
+    }
+
     /**
      * @param tracePath relative to parent test traces folder
      */
-    private static void importTrace(int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
+    private static void importTrace(String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
         SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 
         SWTBotShell shell = openTraceFoldersImport(traceFolder);
@@ -633,7 +917,7 @@ public class ProjectExplorerTracesFolderTest {
             }
         }
 
-        SWTBotImportWizardUtils.setOptions(bot, optionFlags, null);
+        SWTBotImportWizardUtils.setOptions(bot, optionFlags, traceType);
         bot.button("Finish").click();
 
         ImportConfirmation importConfirmation = confirmationSuplier.get();
@@ -665,39 +949,6 @@ public class ProjectExplorerTracesFolderTest {
         traceItem.select();
         SWTBotTreeItem traceTypeItem = SWTBotUtils.getTreeItem(view.bot(), view.bot().tree(), "Resource properties", property);
         return traceTypeItem.cell(1);
-    }
-
-    // TODO: resolve duplication with ProjectExplorerTraceActionsTest
-    private static void testEventsTable(String editorName, long nbEvents, String firstEventStr) {
-        SWTBotEditor editor = SWTBotUtils.activeEventsEditor(fBot, editorName);
-        fBot.waitUntil(ConditionHelpers.numberOfEventsInTrace(TmfTraceManager.getInstance().getActiveTrace(), nbEvents));
-
-        SWTBotTable table = editor.bot().table();
-        fBot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return table.rowCount() > 1;
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "No items in table";
-            }
-        });
-        // Select first event (skip filter/search row)
-        table.getTableItem(1).select();
-
-        editor.bot().waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(firstEventStr);
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "First event not selected";
-            }
-        });
     }
 
     private static SWTBotShell openTraceFoldersImport(SWTBotTreeItem traceItem) {

@@ -23,7 +23,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -32,11 +31,11 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.SWTBotImportWizardUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
@@ -58,8 +57,6 @@ public class ProjectExplorerTraceActionsTest {
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACE_NAME = CUSTOM_TEXT_LOG.getTraceName();
     private static final String RENAMED_TRACE_NAME = TRACE_NAME + 2;
-//    private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
-//    private static final String TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
 
     private static File fTestFile = null;
 
@@ -161,7 +158,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Open").click();
-        testEventsTable(TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
         fBot.closeAllEditors();
     }
@@ -186,7 +183,7 @@ public class ProjectExplorerTraceActionsTest {
         fBot.closeAllEditors();
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
-        testEventsTable(RENAMED_TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         fBot.closeAllEditors();
         SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
     }
@@ -217,7 +214,7 @@ public class ProjectExplorerTraceActionsTest {
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
-        testEventsTable(RENAMED_TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         fBot.closeAllEditors();
         SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
     }
@@ -268,7 +265,7 @@ public class ProjectExplorerTraceActionsTest {
         traceItem.select();
         fBot.activeShell().pressShortcut(Keystrokes.CR);
 
-        testEventsTable(TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
         fBot.closeAllEditors();
     }
@@ -317,7 +314,7 @@ public class ProjectExplorerTraceActionsTest {
         traceItem.select();
         traceItem.doubleClick();
 
-        testEventsTable(TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
         fBot.closeAllEditors();
     }
@@ -366,38 +363,6 @@ public class ProjectExplorerTraceActionsTest {
         text.setText(RENAMED_TRACE_NAME);
         shell.bot().button("OK").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-    }
-
-    private static void testEventsTable(String editorName) {
-        SWTBotEditor editor = SWTBotUtils.activeEventsEditor(fBot, editorName);
-        fBot.waitUntil(ConditionHelpers.numberOfEventsInTrace(TmfTraceManager.getInstance().getActiveTrace(), CUSTOM_TEXT_LOG.getNbEvents()));
-
-        SWTBotTable table = editor.bot().table();
-        fBot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return table.rowCount() > 1;
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "No items in table";
-            }
-        });
-        // Select first event (skip filter/search row)
-        table.getTableItem(1).select();
-
-        editor.bot().waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(CUSTOM_TEXT_LOG.getFirstEventTimestamp());
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "First event not selected";
-            }
-        });
     }
 
     private static void testStatisticsView() {

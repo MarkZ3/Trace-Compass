@@ -115,6 +115,11 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
      */
     public TraceValidateAndImportOperation(Shell shell, List<TraceFileSystemElement> traceFileSystemElements, String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags,
             TmfTraceFolder traceFolderElement) {
+//        for (TraceFileSystemElement element :  traceFileSystemElements) {
+//            System.out.println(element.getFileSystemObject().getAbsolutePath());
+//        }
+//        System.out.println();
+
         fTraceType = traceId;
         fBaseSourceContainerPath = baseSourceContainerPath;
         fDestinationContainerPath = destinationContainerPath;
