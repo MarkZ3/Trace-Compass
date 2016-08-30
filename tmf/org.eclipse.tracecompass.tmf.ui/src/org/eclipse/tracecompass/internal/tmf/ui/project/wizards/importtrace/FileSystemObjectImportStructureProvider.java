@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -45,35 +46,25 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
     }
 
     /**
-     * This orders by number of segments first then by name. So from the
-     * shallowest path to the deepest then by lexical order
+     * This orders by files first then the folders. Then by lexical order.
      */
-//    private final class FileObjectPathComparator implements Comparator<IFileSystemObject> {
-//        @Override
-//        public int compare(IFileSystemObject o1, IFileSystemObject o2) {
-//            String absolutePath = o1.getAbsolutePath();
-//            IPath path = new Path(absolutePath);
-//            String absolutePath2 = o2.getAbsolutePath();
-//            IPath path2 = new Path(absolutePath2);
-//            int segmentCount = path.segmentCount();
-//            if (path.toFile().isDirectory()) {
-//                segmentCount++;
-//            }
-//            int segmentCount2 = path2.segmentCount();
-//            if (path2.toFile().isDirectory()) {
-//                segmentCount2++;
-//            }
-//
-//            // Order from
-//            int compareTo = Integer.compare(segmentCount, segmentCount2);
-//            if (compareTo != 0) {
-//                return compareTo;
-//            }
-//
-//            int compareTo2 = absolutePath.compareToIgnoreCase(absolutePath2);
-//            return compareTo2;
-//        }
-//    }
+    private final class FileObjectPathComparator implements Comparator<IFileSystemObject> {
+        @Override
+        public int compare(IFileSystemObject o1, IFileSystemObject o2) {
+            String absolutePath = o1.getAbsolutePath();
+            File file1 = new File(absolutePath);
+            String absolutePath2 = o2.getAbsolutePath();
+            File file2 = new File(absolutePath2);
+            if (file1.isDirectory() != file2.isDirectory()) {
+                if (file1.isDirectory()) {
+                    return 1;
+                }
+                return -1;
+            }
+
+            return absolutePath.compareToIgnoreCase(absolutePath2);
+        }
+    }
 
     @Override
     public List<IFileSystemObject> getChildren(Object element) {
@@ -83,14 +74,9 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
         for (Object o : children) {
             IFileSystemObject iFileSystemObject = getIFileSystemObject(o);
             adapted.add(iFileSystemObject);
-//            System.out.println(iFileSystemObject.getAbsolutePath());
         }
 
-//        adapted.sort(new FileObjectPathComparator());
-        for (IFileSystemObject o : adapted) {
-            System.out.println(o.getAbsolutePath());
-        }
-        System.out.println();
+        adapted.sort(new FileObjectPathComparator());
         return adapted;
     }
 
