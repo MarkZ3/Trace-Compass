@@ -60,6 +60,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -119,6 +120,11 @@ public class SWTLeakTest {
 
         fTrace = CtfTmfTestTraceUtils.getSyntheticTrace();
         fSyncTrace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
+    }
+
+    @After
+    public void tearDown() {
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     /**
@@ -242,7 +248,6 @@ public class SWTLeakTest {
 
         fBot.closeAllEditors();
         SWTBotUtils.openView(viewId);
-        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     private void openEditor() {
